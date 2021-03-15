@@ -7,12 +7,14 @@
 #
 ###################################################################################################
 """
-Contains the limits of the MAX78000 implementations and custom PyTorch modules that take
+Contains the limitsfrom torchvision import transforms of the MAX78000 implementations and custom PyTorch modules that take
 the limits into account.
 """
 import torch
 import torch.nn as nn
 from torch.autograd import Function
+
+from torchvision import transforms
 
 import devices
 
@@ -31,6 +33,16 @@ class normalize:
             return img.sub(0.5).mul(256.).round().clamp(min=-128, max=127)
         return img.sub(0.5).mul(256.).round().clamp(min=-128, max=127).div(128.)
 
+class rotate:
+    """
+    Rotate input same amount of parameter "angle"
+    """
+    def __init__(self, angle, args):
+        self.angle = angle
+        self.args = args
+
+    def __call__(self, img):
+        return transforms.functional.rotate(img, angle=self.angle, expand=1)
 
 class QuantizationFunction(Function):
     """
